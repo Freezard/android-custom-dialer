@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <TableRow
+        android:id="@+id/tableRow1"
+        android:layout_weight="1" >
+
+        <ImageButton
+            android:id="@+id/imageButton_dialpad_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/dialpad_1_custom"
+            android:contentDescription="@string/one"
+            android:scaleType="centerInside" />
+
+        <ImageButton
+            android:id="@+id/imageButton_dialpad_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/dialpad_2_custom"
+            android:contentDescription="@string/two"
+            android:scaleType="centerInside" />
+
+        <ImageButton
+            android:id="@+id/imageButton_dialpad_3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/dialpad_3_custom"
+            android:contentDescription="@string/three"
+            android:scaleType="centerInside" />
+
+        <ImageButton
+            android:id="@+id/imageButton_dialpad_4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/dialpad_4_custom"
+            android:contentDescription="@string/four"
+            android:scaleType="centerInside" />
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/tableRow2"
+        android:layout_weight="1" >
+
+        <ImageButton
+            android:id="@+id/imageButton_dialpad_5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/dialpad_5_custom"
+            android:contentDescription="@string/five"
+            android:scaleType="centerInside" />
+
+        <ImageButton
+            android:id="@+id/imageButton_dialpad_6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/dialpad_6_custom"
+            android:contentDescription="@string/six"
+            android:scaleType="centerInside" />
+
+        <ImageButton
+            android:id="@+id/imageButton_dialpad_7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/dialpad_7_custom"
+            android:contentDescription="@string/seven"
+            android:scaleType="centerInside" />
+
+        <ImageButton
+            android:id="@+id/imageButton_dialpad_8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/dialpad_8_custom"
+            android:contentDescription="@string/eight"
+            android:scaleType="centerInside" />
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/tableRow3"
+        android:layout_weight="1" >
+
+        <ImageButton
+            android:id="@+id/imageButton_dialpad_9"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/dialpad_9_custom"
+            android:contentDescription="@string/nine"
+            android:scaleType="centerInside" />
+
+        <ImageButton
+            android:id="@+id/imageButton_dialpad_star"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/dialpad_star_custom"
+            android:contentDescription="@string/star"
+            android:scaleType="centerInside" />
+
+        <ImageButton
+            android:id="@+id/imageButton_dialpad_0"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/dialpad_0_custom"
+            android:contentDescription="@string/zero"
+            android:scaleType="centerInside" />
+
+        <ImageButton
+            android:id="@+id/imageButton_dialpad_pound"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/dialpad_pound_custom"
+            android:contentDescription="@string/pound"
+            android:scaleType="centerInside" />
+    </TableRow>
+
+</TableLayout>
