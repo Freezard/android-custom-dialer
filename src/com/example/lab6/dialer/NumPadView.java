@@ -1,9 +1,11 @@
-package com.example.lab5_3;
+package com.example.lab6.dialer;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.TableLayout;
+
+import com.example.lab6.R;
 
 /**
  * NumPadView.java

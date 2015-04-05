@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <EditTextPreference
+        android:defaultValue="@string/data_download_location"
+        android:dialogTitle="@string/download_location"
+        android:key="pref_sound_download_location"
+        android:title="@string/source_for_new_voices" />
+    
+    <EditTextPreference
+        android:dialogTitle="@string/storage_location"
+        android:key="pref_sound_storage_location"
+        android:title="@string/storage_location" />
+
+    <ListPreference
+        android:dialogTitle="@string/select_voice"
+        android:key="pref_sound_files"
+        android:title="@string/voice_files" />
+    
+    <MultiSelectListPreference
+        android:dialogTitle="@string/delete_voices"
+        android:key="pref_delete_sound_files"
+        android:title="@string/delete_voices" />
+
+</PreferenceScreen>

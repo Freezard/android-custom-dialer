@@ -3,11 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="horizontal"
     tools:context=".MainActivity" >
 
-    <com.example.lab5_3.DialerView
+    <com.example.lab6.dialer.DialerView
         android:id="@+id/dialerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+    <WebView
+        android:id="@+id/webView"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" >
+    </WebView>
 
 </LinearLayout>

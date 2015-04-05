@@ -1,12 +1,14 @@
-package com.example.lab5_3;
+package com.example.lab6.dialer;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.media.SoundPool.OnLoadCompleteListener;
 import android.net.Uri;
-import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.util.AttributeSet;
 import android.util.SparseArray;
@@ -18,17 +20,20 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.example.lab6.R;
+import com.example.lab6.utils.Utils;
+
 /**
  * DialerView.java
  * 
  * Custom component consisting of DialPadView and NumPadView. Handles the logic
- * of both component. When a numpad is clicked or pressed using a keyboard, a
+ * of both components. When a numpad is clicked or pressed using a keyboard, a
  * corresponding sound will play and the number/symbol will be appended to the
- * dialpad text view. The arrowpad erases a number or clears the whole number
- * while holding click. The callpad brings up the phone's dialpad along with the
- * entered number.
+ * dialpad. The arrowpad erases a number or clears the whole number when
+ * performing a long click. The callpad calls the number entered in the dialpad.
  */
-public class DialerView extends LinearLayout {
+public class DialerView extends LinearLayout implements
+		OnSharedPreferenceChangeListener {
 	private SoundPool soundPool;
 	private int soundID1, soundID2, soundID3, soundID4, soundID5, soundID6,
 			soundID7, soundID8, soundID9, soundIDStar, soundID0, soundIDPound;
@@ -44,17 +49,31 @@ public class DialerView extends LinearLayout {
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		inflater.inflate(R.layout.dialer_view, this, true);
 
+		SharedPreferences sharedPref = PreferenceManager
+				.getDefaultSharedPreferences(getContext());
+
+		sharedPref.registerOnSharedPreferenceChangeListener(this);
+
+		// Get the path to the selected sound files
+		String soundFilesLocation = sharedPref.getString("pref_sound_files", "");
+
 		// Initialize components
 		initComponents();
-		// Register an onClickListener for all pads
+		
+		// Register an onClickListener to all pads
 		registerOnClickListener();
-		// Set up SoundPool and load the audio files
-		setupSound();
+		
+		// Initialize SoundPool and load the sound files
+		initSound();
+		loadSoundFiles(soundFilesLocation);
 	}
-
+	
+	// ************* EVENT HANDLING *************
+	// ******************************************
+	
 	// OnClickListener for all pads. Plays a corresponding sound file.
-	// Swapping images is done in XML. Arrow pad erases one letter and
-	// call pad calls the phone's dialpad with the entered number.
+	// Swapping images is done in XML. The arrow pad erases one letter
+	// and the call pad calls the number entered in the dialpad.
 	final OnClickListener onClickListener = new OnClickListener() {
 		public void onClick(final View v) {
 			switch (v.getId()) {
@@ -110,7 +129,7 @@ public class DialerView extends LinearLayout {
 				eraseLetter();
 				break;
 			case R.id.imageButton_dialpad_call:
-				dial();
+				call();
 				break;
 			}
 		}
@@ -187,7 +206,32 @@ public class DialerView extends LinearLayout {
 
 		return true;
 	}
+	
+	// Called when a user setting has changed
+	@Override
+	public void onSharedPreferenceChanged(SharedPreferences sharedPref,
+			String key) {		
+		if (key.equals("pref_sound_files")) {
+			// Load the new set of selected sound files
+			String soundFilesLocation = sharedPref.getString(key, "");
+			loadSoundFiles(soundFilesLocation);
+		}
+	}
+	
+	// **************** DIAL PAD ****************
+	// ******************************************
+	
+	// Call the phone number entered in the dialpad
+	private void call() {
+		String number = editText.getText().toString();
+		// The system uses special symbols for the # symbol
+		number = number.replace("#", Uri.encode("#"));
 
+		Intent intent = new Intent(Intent.ACTION_CALL);
+		intent.setData(Uri.parse("tel:" + number));
+		getContext().startActivity(intent);
+	}
+	
 	// Appends text to the dialpad
 	private void appendText(String str) {
 		editText.append(str);
@@ -197,72 +241,54 @@ public class DialerView extends LinearLayout {
 	private void eraseLetter() {
 		Editable text = editText.getText();
 		int length = text.length();
+
 		if (length > 0)
 			text.delete(length - 1, length);
 	}
 
-	// Clears the dialpad text
+	// Clears the dialpad
 	private void clearText() {
 		editText.getText().clear();
 	}
 
-	// Brings up the phone's dialpad and passes the entered number
-	private void dial() {
-		String number = editText.getText().toString();
-		number = number.replace("#", Uri.encode("#"));
-
-		Intent intent = new Intent(Intent.ACTION_DIAL);
-		intent.setData(Uri.parse("tel:" + number));
-		getContext().startActivity(intent);
-	}
-
-	// Sets up SoundPool and load the audio files
-	private void setupSound() {
-		soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
-
-		// Check if external storage is available
-		boolean externalStorageAvailable;
-		String state = Environment.getExternalStorageState();
-
-		if (Environment.MEDIA_MOUNTED.equals(state)) {
-			// We can read the media
-			externalStorageAvailable = true;
-		} else {
-			// Something is wrong. We can't read files
-			externalStorageAvailable = false;
-		}
-
+	// ****************** SOUND *****************
+	// ******************************************
+	
+	// Loads the sound files from the specified location
+	private void loadSoundFiles(String soundLocation) {
 		// Load the sound files from the external sound directory
-		if (externalStorageAvailable) {
-			String soundPath = Environment.getExternalStorageDirectory()
-					.getPath() + "/dialpad/sounds/";
-			String soundDir = "mamacita_us/";
-
-			soundID1 = soundPool.load(soundPath + soundDir + "one.mp3", 1);
-			soundID2 = soundPool.load(soundPath + soundDir + "two.mp3", 1);
-			soundID3 = soundPool.load(soundPath + soundDir + "three.mp3", 1);
-			soundID4 = soundPool.load(soundPath + soundDir + "four.mp3", 1);
-			soundID5 = soundPool.load(soundPath + soundDir + "five.mp3", 1);
-			soundID6 = soundPool.load(soundPath + soundDir + "six.mp3", 1);
-			soundID7 = soundPool.load(soundPath + soundDir + "seven.mp3", 1);
-			soundID8 = soundPool.load(soundPath + soundDir + "eight.mp3", 1);
-			soundID9 = soundPool.load(soundPath + soundDir + "nine.mp3", 1);
-			soundIDStar = soundPool.load(soundPath + soundDir + "star.mp3", 1);
-			soundID0 = soundPool.load(soundPath + soundDir + "zero.mp3", 1);
-			soundIDPound = soundPool
-					.load(soundPath + soundDir + "pound.mp3", 1);
-		} else
-			Toast.makeText(getContext(), R.string.no_sd_card,
+		if (Utils.isExternalStorageReadable()
+				&& Utils.isDirectory(soundLocation)) {
+			soundID1 = soundPool.load(soundLocation + "one.mp3", 1);
+			soundID2 = soundPool.load(soundLocation + "two.mp3", 1);
+			soundID3 = soundPool.load(soundLocation + "three.mp3", 1);
+			soundID4 = soundPool.load(soundLocation + "four.mp3", 1);
+			soundID5 = soundPool.load(soundLocation + "five.mp3", 1);
+			soundID6 = soundPool.load(soundLocation + "six.mp3", 1);
+			soundID7 = soundPool.load(soundLocation + "seven.mp3", 1);
+			soundID8 = soundPool.load(soundLocation + "eight.mp3", 1);
+			soundID9 = soundPool.load(soundLocation + "nine.mp3", 1);
+			soundIDStar = soundPool.load(soundLocation + "star.mp3", 1);
+			soundID0 = soundPool.load(soundLocation + "zero.mp3", 1);
+			soundIDPound = soundPool.load(soundLocation + "pound.mp3", 1);
+		} else {
+			// Disable sound
+			soundID1 = 0;
+			soundID2 = 0;
+			soundID3 = 0;
+			soundID4 = 0;
+			soundID5 = 0;
+			soundID6 = 0;
+			soundID7 = 0;
+			soundID8 = 0;
+			soundID9 = 0;
+			soundIDStar = 0;
+			soundID0 = 0;
+			soundIDPound = 0;
+			
+			Toast.makeText(getContext(), R.string.sound_files_unavailable,
 					Toast.LENGTH_SHORT).show();
-
-		// Register onLoadCompleteListener to SoundPool
-		soundPool.setOnLoadCompleteListener(new OnLoadCompleteListener() {
-			@Override
-			public void onLoadComplete(SoundPool soundPool, int sampleId,
-					int status) {
-				soundFilesLoaded = true;
-			}
-		});
+		}
 	}
 
 	// Plays a sound file
@@ -274,12 +300,15 @@ public class DialerView extends LinearLayout {
 		float maxVolume = (float) audioManager
 				.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
 		float volume = actualVolume / maxVolume;
-		// Make sure the sound file is loaded
+		// Make sure the sound clip is loaded
 		if (soundFilesLoaded)
 			soundPool.play(soundID, volume, volume, 1, 0, 1f);
 	}
 
-	// Initialize components
+	// ****************** INIT ******************
+	// ******************************************
+	
+	// Initializes components
 	private void initComponents() {
 		editText = (EditText) findViewById(R.id.editText_dialpad);
 
@@ -316,36 +345,54 @@ public class DialerView extends LinearLayout {
 	
 	// Registers an onClickListener to all pads
 	private void registerOnClickListener() {
-		imageButtons.get(R.id.imageButton_dialpad_1).setOnClickListener(
+		findViewById(R.id.imageButton_dialpad_1).setOnClickListener(
 				onClickListener);
-		imageButtons.get(R.id.imageButton_dialpad_2).setOnClickListener(
+		findViewById(R.id.imageButton_dialpad_2).setOnClickListener(
 				onClickListener);
-		imageButtons.get(R.id.imageButton_dialpad_3).setOnClickListener(
+		findViewById(R.id.imageButton_dialpad_3).setOnClickListener(
 				onClickListener);
-		imageButtons.get(R.id.imageButton_dialpad_4).setOnClickListener(
+		findViewById(R.id.imageButton_dialpad_4).setOnClickListener(
 				onClickListener);
-		imageButtons.get(R.id.imageButton_dialpad_5).setOnClickListener(
+		findViewById(R.id.imageButton_dialpad_5).setOnClickListener(
 				onClickListener);
-		imageButtons.get(R.id.imageButton_dialpad_6).setOnClickListener(
+		findViewById(R.id.imageButton_dialpad_6).setOnClickListener(
 				onClickListener);
-		imageButtons.get(R.id.imageButton_dialpad_7).setOnClickListener(
+		findViewById(R.id.imageButton_dialpad_7).setOnClickListener(
 				onClickListener);
-		imageButtons.get(R.id.imageButton_dialpad_8).setOnClickListener(
+		findViewById(R.id.imageButton_dialpad_8).setOnClickListener(
 				onClickListener);
-		imageButtons.get(R.id.imageButton_dialpad_9).setOnClickListener(
+		findViewById(R.id.imageButton_dialpad_9).setOnClickListener(
 				onClickListener);
-		imageButtons.get(R.id.imageButton_dialpad_0).setOnClickListener(
+		findViewById(R.id.imageButton_dialpad_star).setOnClickListener(
 				onClickListener);
-		imageButtons.get(R.id.imageButton_dialpad_star).setOnClickListener(
+		findViewById(R.id.imageButton_dialpad_0).setOnClickListener(
 				onClickListener);
-		imageButtons.get(R.id.imageButton_dialpad_pound).setOnClickListener(
+		findViewById(R.id.imageButton_dialpad_pound).setOnClickListener(
 				onClickListener);
-		imageButtons.get(R.id.imageButton_dialpad_arrow).setOnClickListener(
+		findViewById(R.id.imageButton_dialpad_pound).setOnClickListener(
 				onClickListener);
-		imageButtons.get(R.id.imageButton_dialpad_call).setOnClickListener(
+		findViewById(R.id.imageButton_dialpad_arrow).setOnClickListener(
+				onClickListener);
+		findViewById(R.id.imageButton_dialpad_call).setOnClickListener(
 				onClickListener);
 
-		imageButtons.get(R.id.imageButton_dialpad_arrow).setOnLongClickListener(
+		findViewById(R.id.imageButton_dialpad_arrow).setOnLongClickListener(
 				onLongClickListener);
+
+		editText = (EditText) findViewById(R.id.editText_dialpad);
+	}
+	
+	// Sets up SoundPool
+	private void initSound() {
+		soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
+
+		// Register onLoadCompleteListener to SoundPool
+		soundPool.setOnLoadCompleteListener(new OnLoadCompleteListener() {
+			@Override
+			public void onLoadComplete(SoundPool soundPool, int sampleId,
+					int status) {
+				soundFilesLoaded = true;
+			}
+		});
 	}
 }

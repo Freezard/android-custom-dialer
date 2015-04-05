@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <com.example.lab5_3.DialPadView
+    <com.example.lab6.dialer.DialPadView
         android:id="@+id/dialPadView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -13,7 +13,7 @@
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin" />
 
-    <com.example.lab5_3.NumPadView
+    <com.example.lab6.dialer.NumPadView
         android:id="@+id/numPadView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
